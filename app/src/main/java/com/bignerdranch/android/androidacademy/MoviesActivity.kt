@@ -3,6 +3,7 @@ package com.bignerdranch.android.androidacademy
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Call
@@ -14,45 +15,26 @@ class MoviesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movies)
 
-        // getting the recyclerview by its id
+        val data = ArrayList<Movies>()
         val recyclerview = findViewById<RecyclerView>(R.id.recycleView)
-
-        // this creates a vertical layout Manager
         recyclerview.layoutManager = LinearLayoutManager(this)
 
-        // ArrayList of class ItemsViewModel
-        val data = ArrayList<Movies>()
+        val token = "ZQQ8GMN-TN54SGK-NB3MKEC-ZKB8V06"
+        val search = "326"
+        val field = "id"
 
-        // This loop will create 20 Views containing
-        // the image with the count of view
-
-
-        // This will pass the ArrayList to our Adapter
-
-
-        // Setting the Adapter with the recyclerview
-
-
-        val apiInterface = ApiInterface.create().getMovies(
-                "ZQQ8GMN-TN54SGK-NB3MKEC-ZKB8V06",
-                "2000",
-                "id")
-
-
+        val apiInterface = ApiInterface.create().getMovies(token, field, search)
 
         //apiInterface.enqueue( Callback<List<Movie>>())
-        apiInterface.enqueue(object : Callback<Movies> {
+        apiInterface.enqueue(object : Callback<Movies>, CustomAdapter.ItemClickListener {
             override fun onResponse(call: Call<Movies>?, response: Response<Movies>?) {
-
-                Log.d("testLogs", "fun onResponse: ${response?.body().toString()}")
+                Log.d("logs", "onResponse: ${response?.body()} ")
 
                 if (response?.body() != null) {
+                    data.add(response.body()!!)
 
-                    Log.d("testLogs", "Call: ${call.toString()} Success")
-
-
-                        val adapter = CustomAdapter(listOf(response.body()) as List<Movies>)
-                        recyclerview.adapter = adapter
+                    val adapter = CustomAdapter(data, this)
+                    recyclerview.adapter = adapter
 
                 }
             }
@@ -60,6 +42,10 @@ class MoviesActivity : AppCompatActivity() {
             override fun onFailure(call: Call<Movies>?, t: Throwable?) {
                 Log.d("testLogs", "onFailure: ${t?.message}")
 
+            }
+
+            override fun onItemClick(position: Int) {
+                Toast.makeText(this@MoviesActivity, "on Item Clicked", Toast.LENGTH_SHORT).show()
             }
         })
 

@@ -7,17 +7,22 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bignerdranch.android.androidacademy.viewmodel.TestingDataClass
 import com.squareup.picasso.Picasso
 
-class CustomAdapter(private val mList: List<Movies>) : RecyclerView.Adapter<CustomAdapter.MyViewHolder>() {
+class CustomAdapter(private val mList: List<Movies?>,
+                    private val mItemClickListener: ItemClickListener
+                    ) : RecyclerView.Adapter<CustomAdapter.MyViewHolder>() {
+
+    interface ItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        // inflates the card_view_design view
-        // that is used to hold list item
+
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.card_view_design, parent, false)
+                .inflate(R.layout.card_view_design, parent, false)
 
         return MyViewHolder(view)
     }
@@ -25,12 +30,9 @@ class CustomAdapter(private val mList: List<Movies>) : RecyclerView.Adapter<Cust
     // binds the list items to a view
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        val itemsViewModel = mList?.get(position)
-        holder.textView.text = itemsViewModel.name
-        Log.d("testLogs", "onBindViewHolder: ${holder.textView.text} ")
-        Picasso.get().load(itemsViewModel.poster.url).into(holder.imageView)
-
-
+        val itemsViewModel = mList[position]
+        holder.textView.text = itemsViewModel?.description
+        Picasso.get().load(itemsViewModel?.poster?.url).into(holder.imageView)
     }
 
     // return the number of the items in the list
@@ -39,8 +41,15 @@ class CustomAdapter(private val mList: List<Movies>) : RecyclerView.Adapter<Cust
     }
 
     // Holds the views for adding it to image and text
-    class MyViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
+    inner class MyViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
+
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
         val textView: TextView = itemView.findViewById(R.id.textView)
+
+        init {
+            ItemView.setOnClickListener {
+                mItemClickListener?.onItemClick(adapterPosition)
+            }
+        }
     }
 }

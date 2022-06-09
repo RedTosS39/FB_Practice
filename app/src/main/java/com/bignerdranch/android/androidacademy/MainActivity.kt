@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var database: DatabaseReference
     private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
+            FirebaseAuthUIActivityResultContract()
     ) { res ->
         this.onSignInResult(res)
     }
@@ -31,6 +31,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val intent = Intent(this@MainActivity, MoviesActivity::class.java)
+        startActivity(intent)
+
+
+    }
+
+    private fun launchDataBase() {
         database = Firebase.database.reference
 
         val providers = arrayListOf(
@@ -44,7 +51,6 @@ class MainActivity : AppCompatActivity() {
         signInLauncher.launch(signInIntent)
 
     }
-
 
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
